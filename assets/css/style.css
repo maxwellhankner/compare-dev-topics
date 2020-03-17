@@ -1,3 +1,6 @@
+#page-title:hover {
+    cursor: pointer;
+}
 .card {
     margin: 10px;
 }

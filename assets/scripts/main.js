@@ -6,20 +6,34 @@ var chartResultsContainer = $('#chart-results-container');
 var searchButton = $('#search-submit-button');
 // Search field
 var searchField = $('#search-input-field');
+// Page title
+var pageTitle = $('#page-title');
 
-// -------------------------------------------------- Navigation
-// Hide results on page launch
+// -------------------------------------------------- Navigation and Views
+// Hidden on page launch
 chartResultsContainer.attr('style', 'display: none;');
 
-// Search
-searchButton.click(function(event){
+// Title listener
+pageTitle.click(function(event){
+    // Do not refresh
     event.preventDefault();
-    console.log(searchField.val())
+    // Show the chart result container
+    chartResultsContainer.attr('style', 'display: none;');
+    // Hide the welcome container
+    welcomeContainer.attr('style', 'display: block;');
+})
+
+// Search listener
+searchButton.click(function(event){
+    // Do not refresh
+    event.preventDefault();
+    // Clear the search form text
     searchField.val('');
+    // Show the chart result container
     chartResultsContainer.attr('style', 'display: grid;');
+    // Hide the welcome container
     welcomeContainer.attr('style', 'display: none;');
-    // get api responses
-    // Run buildChart
+    // Run buildChart function with static parameters
     buildChart(['react'], [10000]);
 })
 
@@ -28,23 +42,50 @@ searchButton.click(function(event){
 let myChart = document.getElementById('my-chart').getContext('2d');
 function buildChart(topics, results){
     console.log(topics, results);
-    let barChart = new Chart(myChart, {
-        type: 'bar',
-        data: {
-            labels: ['Repositories'],
-            datasets: [{
-                label: topics,
-                data: results
-            }]
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    }
+    if(topics.length = 1){
+        let barChart = new Chart(myChart, {
+            type: 'bar',
+            data: {
+                labels: ['Repositories'],
+                datasets: [{
+                    label: topics,
+                    data: results
                 }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
             }
-        }
-    });
+        });
+    }
+    else if(topics.length = 2){
+        let barChart = new Chart(myChart, {
+            type: 'bar',
+            data: {
+                labels: ['Repositories'],
+                datasets: [{
+                    label: topics[0],
+                    data: results[0]
+                },
+                {
+                    label: topics[1],
+                    data: results[1]
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+    }
 }
