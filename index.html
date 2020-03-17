@@ -15,7 +15,7 @@
         <form class="form-inline">
             <!-- Search -->
             <!-- <button id="search-submit-button" class="btn btn-outline-dark my-2 my-sm-0" type="submit">+</button> -->
-            <input id="search-input-field" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+            <input id="search-input-field" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"/>
             <button id="search-submit-button" class="btn btn-outline-dark my-2 my-sm-0" type="submit">Search</button>
         </form>
     </nav>
@@ -25,9 +25,9 @@
         <!-- All Charts Contatiner -->
         <div class="all-charts-container">
             <div class="card chart-section">
+                <div class="card-header">Github Results</div>
                 <div class="card-body">
                     <div id="github-result-chart" class="result-chart">
-                        <h5 class="card-title">Github Results</h5>
                         <div id="github-result-test">test number here</div>
                         <!-- Test Chart -->
                         <canvas id="my-chart" height="250px"></canvas>
@@ -35,9 +35,9 @@
                 </div>
             </div>
             <div class="card visualization-section">
+                <div class="card-header">Stack Overflow Results</div>
                 <div class="card-body">
                     <div id="stack-overflow-result-chart" class="result-chart">
-                        <h5 class="card-title">Stack Overflow Results</h5>
                         <div id="stack-overflow-result-test">test number here</div>
                     </div>
                 </div>
@@ -50,19 +50,40 @@
         let barChart = new Chart(myChart, {
             type: 'bar',
             data: {
-                labels: ['GitHub'],
+                labels: ['repositories', 'commits', 'visits'],
                 datasets: [{
-                    label: 'clicks',
-                    data: [10000]
+                    label: 'count',
+                    data: [10000, 8700, 5600]
                 }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
             }
         });
     </script>
 
     <!-- Bootstrap Javascript Files -->
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+      integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+      integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+      crossorigin="anonymous"
+    ></script>
 
     <!-- Project Javascript Files -->
     <script src="assets/scripts/main.js"></script>
