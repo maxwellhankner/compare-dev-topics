@@ -1,4 +1,7 @@
-.visualization-container {
+.all-charts-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
+}
+#search-input-field {
+    margin-left: 8px;
 }
