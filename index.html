@@ -15,58 +15,45 @@
         <form class="form-inline">
             <!-- Search -->
             <!-- <button id="search-submit-button" class="btn btn-outline-dark my-2 my-sm-0" type="submit">+</button> -->
-            <input id="search-input-field" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"/>
+            <input id="search-input-field" class="form-control mr-sm-2" type="search" placeholder="Topic" aria-label="Search"/>
             <button id="search-submit-button" class="btn btn-outline-dark my-2 my-sm-0" type="submit">Search</button>
         </form>
     </nav>
 
-    <!-- Main Content -->
-    <div class="container">
-        <!-- All Charts Contatiner -->
-        <div class="all-charts-container">
-            <div class="card chart-section">
-                <div class="card-header">Github Results</div>
-                <div class="card-body">
-                    <div id="github-result-chart" class="result-chart">
-                        <div id="github-result-test">test number here</div>
-                        <!-- Test Chart -->
-                        <canvas id="my-chart" height="250px"></canvas>
-                    </div>
+    <!-- Landing Page Container -->
+    <div id="welcome-container" class="container">
+        <div class="card">
+            <div class="card-header">
+                Welcome
+            </div>
+            <div class="card-body">
+                Instructions: Use the searchbox to find out the popularity of a topic.
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Results Contatiner -->
+    <div id="chart-results-container" class="container">
+        <div class="card chart-section">
+            <div class="card-header">Github Results</div>
+            <div class="card-body">
+                <div id="github-result-chart" class="result-chart">
+                    <div id="github-result-test">test number here</div>
+                    <!-- Test Chart -->
+                    <canvas id="my-chart" height="250px"></canvas>
                 </div>
             </div>
-            <div class="card visualization-section">
-                <div class="card-header">Stack Overflow Results</div>
-                <div class="card-body">
-                    <div id="stack-overflow-result-chart" class="result-chart">
-                        <div id="stack-overflow-result-test">test number here</div>
-                    </div>
+        </div>
+        <div class="card visualization-section">
+            <div class="card-header">Stack Overflow Results</div>
+            <div class="card-body">
+                <div id="stack-overflow-result-chart" class="result-chart">
+                    <div id="stack-overflow-result-test">test number here</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-        let myChart = document.getElementById('my-chart').getContext('2d');
-        let barChart = new Chart(myChart, {
-            type: 'bar',
-            data: {
-                labels: ['repositories', 'commits', 'visits'],
-                datasets: [{
-                    label: 'count',
-                    data: [10000, 8700, 5600]
-                }]
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }]
-                }
-            }
-        });
-    </script>
 
     <!-- Bootstrap Javascript Files -->
     <script

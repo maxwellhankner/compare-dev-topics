@@ -1,4 +1,7 @@
-.all-charts-container {
+.card {
+    margin: 10px;
+}
+#chart-results-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
 }
