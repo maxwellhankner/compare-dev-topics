@@ -33,6 +33,14 @@ searchButton.click(function(event){
     chartResultsContainer.attr('style', 'display: grid;');
     // Hide the welcome container
     welcomeContainer.attr('style', 'display: none;');
+
+    // Figure out how many topics the user desires
+    
+    // got topics
+    // call githubFunction(topic) 
+
+    // Build two arrays
+
     // Run buildChart function with static parameters
     buildChart(['react'], [10000]);
 })
@@ -40,8 +48,18 @@ searchButton.click(function(event){
 // -------------------------------------------------- Chart Function
 
 let myChart = document.getElementById('my-chart').getContext('2d');
-function buildChart(topics, results){
-    console.log(topics, results);
+function buildChart(topics, githubResults){
+    var githubDataSet = [];
+    // var stackOverflowDataSet = [];
+    for(i = 0; i < topics.length; i++){
+        var topicDataObject = {
+            label: topics[i],
+            data: githubResults[i]
+        }
+        console.log(topicDataObject);
+        githubDataSet.push(topicDataObject);
+    }
+    console.log(githubDataSet);
     if(topics.length = 1){
         let barChart = new Chart(myChart, {
             type: 'bar',
@@ -50,31 +68,6 @@ function buildChart(topics, results){
                 datasets: [{
                     label: topics,
                     data: results
-                }]
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }]
-                }
-            }
-        });
-    }
-    else if(topics.length = 2){
-        let barChart = new Chart(myChart, {
-            type: 'bar',
-            data: {
-                labels: ['Repositories'],
-                datasets: [{
-                    label: topics[0],
-                    data: results[0]
-                },
-                {
-                    label: topics[1],
-                    data: results[1]
                 }]
             },
             options: {
