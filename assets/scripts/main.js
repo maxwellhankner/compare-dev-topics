@@ -4,10 +4,14 @@ var welcomeContainer = $('#welcome-container');
 var chartResultsContainer = $('#chart-results-container');
 // Buttons
 var searchButton = $('#search-submit-button');
+var addTopicButton = $('#add-topic-button');
+var deleteTopicButtons = $('.delete-topic-buttons');
 // Search field
 var searchField = $('#search-input-field');
 // Page title
 var pageTitle = $('#page-title');
+// Topic container
+var topicContainer = $('#topic-container');
 
 // -------------------------------------------------- Navigation and View Management
 // Hidden on page launch
@@ -21,6 +25,32 @@ pageTitle.click(function(event){
     chartResultsContainer.attr('style', 'display: none;');
     // Hide the welcome container
     welcomeContainer.attr('style', 'display: block;');
+})
+
+// Multisearch
+addTopicButton.click(function(event){
+    // Do not refresh
+    event.preventDefault();
+    console.log(searchField.val());
+    createTopicElement(searchField.val());
+    searchField.val('');
+    // If there is nothing in the field, do nothing
+    // If there is something in the field..
+    // create a new topic-element div with the search form value in the value
+    // prepend it to the top of the form-inline div
+})
+
+// createTopicElement function
+function createTopicElement(userTopic) {
+    var newTopicElement = $($.parseHTML('<div class="topic-element"><form class="form-inline"><input id="search-input-field" class="form-control mr-sm-2" aria-label="Search" value="' + userTopic + '"/><button class="btn btn-outline-dark my-2 my-sm-0 delete-topic-buttons" type="submit"><i class="material-icons">close</i></button></form></div>'));
+    topicContainer.prepend(newTopicElement);
+}
+
+// Delete topic buttons
+// event listener on all dynamically changing topic-elements
+$(document).on('click', '.delete-topic-buttons', function(event){
+    event.preventDefault();
+    console.log(event.target());
 })
 
 // Search listener
