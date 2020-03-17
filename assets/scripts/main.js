@@ -27,33 +27,54 @@ pageTitle.click(function(event){
     welcomeContainer.attr('style', 'display: block;');
 })
 
-// Multisearch
+// -------------------------------------------------- Multisearch
+var topicsArray = []
 addTopicButton.click(function(event){
     // Do not refresh
     event.preventDefault();
-    console.log(searchField.val());
-    createTopicElement(searchField.val());
+    if (!(searchField.val() === '')){
+        topicsArray.push(searchField.val());
+    }
+    buildTopicsDiv()
     searchField.val('');
-    // If there is nothing in the field, do nothing
-    // If there is something in the field..
-    // create a new topic-element div with the search form value in the value
-    // prepend it to the top of the form-inline div
 })
 
+// BuildTopicsDiv function
+function buildTopicsDiv(){
+    topicContainer.empty();
+    for (i = 0; i < topicsArray.length; i++){
+        createTopicElement(topicsArray[i], i);
+    }
+}
+
 // createTopicElement function
-function createTopicElement(userTopic) {
-    var newTopicElement = $($.parseHTML('<div class="topic-element"><form class="form-inline"><input id="search-input-field" class="form-control mr-sm-2" aria-label="Search" value="' + userTopic + '"/><button class="btn btn-outline-dark my-2 my-sm-0 delete-topic-buttons" type="submit"><i class="material-icons">close</i></button></form></div>'));
+function createTopicElement(userTopic, index) {
+    var newTopicElement = $($.parseHTML('<div class="topic-element"><form class="form-inline"><input id="search-input-field" class="form-control mr-sm-2" aria-label="Search" value="' + userTopic + '" readonly /><button id="' + index + '" class="btn btn-outline-dark my-2 my-sm-0 delete-topic-buttons" type="submit"><i class="material-icons">close</i></button></form></div>'));
     topicContainer.prepend(newTopicElement);
 }
 
-// Delete topic buttons
-// event listener on all dynamically changing topic-elements
-$(document).on('click', '.delete-topic-buttons', function(event){
+// Delete topic buttons listener
+$(document).on('click', '.topic-element', function(event){
     event.preventDefault();
-    console.log(event.target());
+    
+    if (event.target.tagName.toLowerCase() === 'button') {
+        // console.log('button');
+        //console.log(event.target.parentElement.parentElement.parentElement);
+        var index = event.target.id;
+        topicsArray.splice(index, 1);
+        buildTopicsDiv()
+    }
+    else if (event.target.tagName.toLowerCase() === 'i') {
+        // console.log('i');
+        var index = event.target.parentElement.id;
+        topicsArray.splice(index, 1);
+        buildTopicsDiv()
+        // console.log(event.target.parentElement.id);
+    }
+
 })
 
-// Search listener
+// Search button listener
 searchButton.click(function(event){
     // Do not refresh
     event.preventDefault();
@@ -64,17 +85,15 @@ searchButton.click(function(event){
     // Hide the welcome container
     welcomeContainer.attr('style', 'display: none;');
 
-    // Figure out how many topics the user desires
-    
-    // got topics
-    // call githubFunction(topic) 
+    // create and polulate both result arrays
+    for (i = 0; i < topicsArray.length; i++) {
+        // call github api function and set response into github array
+        // call stock overflow api function and set response into stack overflow array
+    }
 
-    // Build two arrays
-
-    // Run buildChart function with static parameters
+    // Run buildChart functions with the arrays
     buildGithubChart(['react'], [10000]);
     buildStackOverflowChart(['react'], [8700]);
-
     // buildGithubChart(['react', 'angular'], [9000, 7600]);
     // buildStackOverflowChart(['react', 'angular'], [12000, 5700]);
 })
