@@ -4,38 +4,47 @@ var welcomeContainer = $('#welcome-container');
 var chartResultsContainer = $('#chart-results-container');
 // Buttons
 var searchButton = $('#search-submit-button');
+// Search field
+var searchField = $('#search-input-field');
 
-// Navigation
+// -------------------------------------------------- Navigation
 // Hide results on page launch
 chartResultsContainer.attr('style', 'display: none;');
 
-// Event listener for search
+// Search
 searchButton.click(function(event){
     event.preventDefault();
-    console.log('hello')
+    console.log(searchField.val())
+    searchField.val('');
     chartResultsContainer.attr('style', 'display: grid;');
     welcomeContainer.attr('style', 'display: none;');
+    // get api responses
+    // Run buildChart
+    buildChart(['react'], [10000]);
 })
 
+// -------------------------------------------------- Chart Function
 
-// Charts
 let myChart = document.getElementById('my-chart').getContext('2d');
-let barChart = new Chart(myChart, {
-    type: 'bar',
-    data: {
-        labels: ['repositories', 'commits', 'visits'],
-        datasets: [{
-            label: 'count',
-            data: [10000, 8700, 5600]
-        }]
-    },
-    options: {
-        scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero: true
-                }
+function buildChart(topics, results){
+    console.log(topics, results);
+    let barChart = new Chart(myChart, {
+        type: 'bar',
+        data: {
+            labels: ['Repositories'],
+            datasets: [{
+                label: topics,
+                data: results
             }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
         }
-    }
-});
+    });
+}
