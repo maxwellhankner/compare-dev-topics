@@ -1,10 +1,13 @@
 "use strict";
 
-var GetStackOverflow = function() {
+var GetStackOverflow = function(tagArray) {
+  //////////////////////////////////////////////////////////////////////////
+  // remove spaces and replace commas with semi-colons for queryString
   this.buildStringList = function(array) {
-    //replace commas with semi-colons for queryString
     return array
       .toString()
+      .split(" ")
+      .join("")
       .split(",")
       .join(";");
   };
@@ -17,9 +20,9 @@ var GetStackOverflow = function() {
   //        ["reactjs"]
   //        "reactjs"
   //        "reactjs,vuejs,angularjs"
-  this.buildQueryString = function(tagArray, type) {
+  //
+  this.buildQueryString = function(tagArray) {
     var queryURL;
-    console.log(typeof tagArray, tagArray);
     // a switch is used here to achieve the effect "if/else && always"
     // switch(true) is used here to allow each case to be processed as well as in this particular order.
     switch (true) {
@@ -35,7 +38,7 @@ var GetStackOverflow = function() {
         throw "- buildQueryString:invalid input on tagArray";
 
       // Always remove a trailing comma (,) or semicolon (;). No 'break' is used here
-      // and positionally it is placed 'on-top' to achieve 'always' behavior.
+      // and positionally it is placed 'on-top' of any actions to achieve 'always' behavior.
       case tagArray[tagArray.length - 1] === "," ||
         tagArray[tagArray.length - 1] === ";":
         tagArray = tagArray.slice(0, -1);
@@ -44,31 +47,38 @@ var GetStackOverflow = function() {
       // if variable named 'array' is indeed an array of non-zero length
       // or, if it a string that includes a comma or semicolon:
       //   - stringify the input.
-      case (Array.isArray(tagArray) === true) ||
-        (typeof tagArray === "string"):
+      case Array.isArray(tagArray) === true || typeof tagArray === "string":
         queryURL =
           "https://api.stackexchange.com/2.2/tags/%7B" +
           this.buildStringList(tagArray) +
           "%7D/synonyms?order=desc&sort=creation&site=stackoverflow";
         break;
       default:
+        // if you've gotten here, watch out for dragons
+        throw "- buildQueryString:unhandled exception - exiting";
     }
-    console.log("result: ",queryURL);
+    // return the final query string
     return queryURL;
   };
 
-
-  this.tags = function(array) {
-    // $.ajax({
-    //   url: queryURL,
-    //   type: "GET",
-    //   datatype: 'json'
-    // }).then(function (data) {
-    //   console.log(data);
-    // });
+  this.getJSON = function(queryURL) {
+    $.ajax({
+      url: queryURL,
+      type: "GET",
+      datatype: "json"
+    }).then(function(data) {
+      return data;
+    });
   };
+
+  this.parsedJSON = JSON.parse(this.getJSON(this.buildQueryString(tagArray)));
+
+  this.result = {};
+
+  this.count = {};
 };
 var stackOverflow = new GetStackOverflow();
-var tag = "hello,goodbye;fairwell;";
-stackOverflow.buildQueryString(tag, "tags");
+var tag = "javascript ,react; angular ,  view,";
+console.log(stackOverflow.buildQueryString(tag));
 //stackOverflow.buildQueryString(["javascript", "reactjs"], "questions");
+
