@@ -4,21 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" href="assets/css/style.css">
     <title>Compare Dev Topics</title>
-  </head>
-  <body>
+</head>
+<body>
+          
     <!-- Header -->
     <nav class="navbar navbar-light bg-light">
-        <a class="navbar-brand">Compare Dev Topics</a>
+        <a id="page-title" class="navbar-brand">Compare Dev Topics</a>
         <form class="form-inline">
             <!-- Search -->
-            <!-- <button id="search-submit-button" class="btn btn-outline-dark my-2 my-sm-0" type="submit">+</button> -->
-            <input id="search-input-field" class="form-control mr-sm-2" type="search" placeholder="Topic" aria-label="Search"/>
             <button id="search-submit-button" class="btn btn-outline-dark my-2 my-sm-0" type="submit">Search</button>
+            <input id="search-input-field" class="form-control mr-sm-2" type="search" placeholder="Topic" aria-label="Search"/>
+            <button id="add-topic-button" class="btn btn-outline-dark my-2 my-sm-0" type="submit">
+                <i class="material-icons">add</i>
+            </button>
         </form>
     </nav>
+
+    <!-- Multisearch Topics Container -->
+    <div id="topic-container" class="topic-container">
+    </div>
 
     <!-- Landing Page Container -->
     <div id="welcome-container" class="container">
@@ -38,9 +46,8 @@
             <div class="card-header">Github Results</div>
             <div class="card-body">
                 <div id="github-result-chart" class="result-chart">
-                    <div id="github-result-test">test number here</div>
-                    <!-- Test Chart -->
-                    <canvas id="my-chart" height="250px"></canvas>
+                    <!-- Github Chart -->
+                    <canvas id="github-chart" height="250px"></canvas>
                 </div>
             </div>
         </div>
@@ -48,7 +55,8 @@
             <div class="card-header">Stack Overflow Results</div>
             <div class="card-body">
                 <div id="stack-overflow-result-chart" class="result-chart">
-                    <div id="stack-overflow-result-test">test number here</div>
+                    <!-- Stack Overflow Chart -->
+                    <canvas id="stack-overflow-chart" height="250px"></canvas>
                 </div>
             </div>
         </div>

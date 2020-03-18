@@ -1,6 +1,6 @@
 "use strict";
 
-var GetStackOverflow = function(tagArray) {
+var GetStackOverflow = function() {
   //////////////////////////////////////////////////////////////////////////
   // remove spaces and replace commas with semi-colons for queryString
   this.buildStringList = function(array) {
@@ -22,6 +22,8 @@ var GetStackOverflow = function(tagArray) {
   //        "reactjs,vuejs,angularjs"
   //
   this.buildQueryString = function(tagArray) {
+    // console.log(typeof tagArray);
+    // console.log(tagArray);
     var queryURL;
     // a switch is used here to achieve the effect "if/else && always"
     // switch(true) is used here to allow each case to be processed as well as in this particular order.
@@ -42,7 +44,6 @@ var GetStackOverflow = function(tagArray) {
       case tagArray[tagArray.length - 1] === "," ||
         tagArray[tagArray.length - 1] === ";":
         tagArray = tagArray.slice(0, -1);
-        console.log(tagArray);
 
       // if variable named 'array' is indeed an array of non-zero length
       // or, if it a string that includes a comma or semicolon:
@@ -61,8 +62,8 @@ var GetStackOverflow = function(tagArray) {
     return queryURL;
   };
 
-  this.getJSON = function(queryURL) {
-    $.ajax({
+  this.getJSON = async function(queryURL) {
+    await $.ajax({
       url: queryURL,
       type: "GET",
       datatype: "json"
@@ -71,14 +72,26 @@ var GetStackOverflow = function(tagArray) {
     });
   };
 
-  this.parsedJSON = JSON.parse(this.getJSON(this.buildQueryString(tagArray)));
+  this.rawJSON;
+  this.parsedJSON;
 
-  this.result = {};
+  
 
-  this.count = {};
+  this.calcCount = function (tags) {
+    console.log("Result set. -- stored in: this.result");
+    this.rawJSON = this.getJSON(this.buildQueryString(tags));
+     
+
+  }
+
+  this.result = {}
 };
+
+
+
 var stackOverflow = new GetStackOverflow();
 var tag = "javascript ,react; angular ,  view,";
-console.log(stackOverflow.buildQueryString(tag));
+stackOverflow.calcCount(tag);
+console.log(stackOverflow.rawJSON);
 //stackOverflow.buildQueryString(["javascript", "reactjs"], "questions");
 
