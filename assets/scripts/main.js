@@ -94,33 +94,30 @@ searchButton.click(async function(event){
     chartResultsContainer.attr('style', 'display: block;');
     // Hide the welcome container
     welcomeContainer.attr('style', 'display: none;');
-
     
 
     // Arrays to store api call response values
     var githubResultsArray = [];
-    var stackOverflowResultsArray = [13000, 11300, 4500];
-
-
-    githubResultsArray[0] = await createResultArrays(topicsArray, githubResultsArray);
-    console.log(githubResultsArray);
+    var stackOverflowResultsArray = [];
+    console.log(topicsArray);
+    for(i = 0; i < topicsArray.length; i++){
+        var currentCount = await createResultArrays(topicsArray)
+        githubResultsArray.push(currentCount);
+        console.log(currentCount);
+    }
+    
+    console.log(githubResultsArray)
+    
 
     // Run buildChart functions with the arrays
     buildGithubChart(topicsArray, githubResultsArray);
     buildStackOverflowChart(topicsArray, stackOverflowResultsArray);
     
-    console.log(topicsArray);
 })
 
 // Create result arrays
-function createResultArrays(topics, githubResultsArray) {
-    for (i = 0; i < topics.length; i++) {
-        // call github api function and put response into github array
-        console.log('in');
-        var topicsReposCount = getGitHubReposCount(topics[i]);
-        //githubResultArray.push(getGithubReposCount(topics[i]));
-        // call stock overflow api function and put response into stack overflow array
-    }
+function createResultArrays(topics) {
+    var topicsReposCount = getGitHubReposCount(topics[i]);
     return topicsReposCount
 }
 
@@ -129,6 +126,7 @@ function createResultArrays(topics, githubResultsArray) {
 let githubChart = document.getElementById('github-chart').getContext('2d');
 // Github Chart Function
 function buildGithubChart(topics, githubResults){
+    console.log('results: ' + githubResults);
     // Create empty array for datasets:
     var githubDataSet = [];
     // Loop the topics and populate dataset array
