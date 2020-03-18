@@ -34,10 +34,10 @@ addTopicButton.click(function(event){
     event.preventDefault();
     if (!(searchField.val() === '')){
         topicsArray.push(searchField.val());
-    }
-    buildTopicsDiv()
-    searchField.val('');
-})
+        }
+        buildTopicsDiv()
+        searchField.val('');
+    })
 
 // BuildTopicsDiv function
 function buildTopicsDiv(){
@@ -78,12 +78,24 @@ $(document).on('click', '.topic-element', function(event){
 searchButton.click(function(event){
     // Do not refresh
     event.preventDefault();
+    // If some text is in the field, add it to the topicsArray and build the topic elements
+    if (!(searchField.val() === '')) {
+        topicsArray.push(searchField.val());
+        buildTopicsDiv()
+    }
+    // If nothing is in the seracg field or the topics awway, dont to anything
+    if (searchField.val() === '' && topicsArray.length === 0 ){
+        console.log('nada');
+        return
+    }
     // Clear the search form text
     searchField.val('');
     // Show the chart result container
     chartResultsContainer.attr('style', 'display: block;');
     // Hide the welcome container
     welcomeContainer.attr('style', 'display: none;');
+
+    
 
     // Arrays to store api call response values
     var githubResultArray = [];
@@ -94,6 +106,8 @@ searchButton.click(function(event){
     // Run buildChart functions with the arrays
     buildGithubChart(topicsArray, githubResultArray);
     buildStackOverflowChart(topicsArray, stackOverflowResultsArray);
+    
+    console.log(topicsArray);
 })
 
 // Create result arrays
