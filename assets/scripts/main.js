@@ -75,7 +75,7 @@ $(document).on('click', '.topic-element', function(event){
 })
 
 // -------------------------------------------------- Run Search
-searchButton.click(function(event){
+searchButton.click(async function(event){
     // Do not refresh
     event.preventDefault();
     // If some text is in the field, add it to the topicsArray and build the topic elements
@@ -98,24 +98,30 @@ searchButton.click(function(event){
     
 
     // Arrays to store api call response values
-    var githubResultArray = [];
-    var stackOverflowResultsArray = [];
+    var githubResultsArray = [];
+    var stackOverflowResultsArray = [13000, 11300, 4500];
 
-    createResultArrays(topicsArray, githubResultArray, stackOverflowResultsArray);
+
+    githubResultsArray[0] = await createResultArrays(topicsArray, githubResultsArray);
+    console.log(githubResultsArray);
 
     // Run buildChart functions with the arrays
-    buildGithubChart(topicsArray, githubResultArray);
+    buildGithubChart(topicsArray, githubResultsArray);
     buildStackOverflowChart(topicsArray, stackOverflowResultsArray);
     
     console.log(topicsArray);
 })
 
 // Create result arrays
-function createResultArrays(topics, github, stackOverflow) {
+function createResultArrays(topics, githubResultsArray) {
     for (i = 0; i < topics.length; i++) {
         // call github api function and put response into github array
+        console.log('in');
+        var topicsReposCount = getGitHubReposCount(topics[i]);
+        //githubResultArray.push(getGithubReposCount(topics[i]));
         // call stock overflow api function and put response into stack overflow array
     }
+    return topicsReposCount
 }
 
 // -------------------------------------------------- Chart Functions
