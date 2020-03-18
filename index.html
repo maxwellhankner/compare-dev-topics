@@ -14,7 +14,7 @@
     <!-- Header -->
     <nav class="navbar navbar-light bg-light">
         <a id="page-title" class="navbar-brand">Compare Dev Topics</a>
-        <form class="form-inline">
+        <form class="form-inline ml-auto">
             <!-- Search -->
             <button id="search-submit-button" class="btn btn-outline-dark my-2 my-sm-0" type="submit">Search</button>
             <input id="search-input-field" class="form-control mr-sm-2" type="search" placeholder="Topic" aria-label="Search"/>
@@ -42,26 +42,32 @@
 
     <!-- Chart Results Contatiner -->
     <div id="chart-results-container" class="container">
-        <div class="card chart-section">
-            <div class="card-header">Github Results</div>
-            <div class="card-body">
-                <div id="github-result-chart" class="result-chart">
-                    <!-- Github Chart -->
-                    <canvas id="github-chart" height="250px"></canvas>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="card chart-section">
+                    <div class="card-header">Github Results</div>
+                    <div class="card-body">
+                        <div id="github-result-chart" class="result-chart">
+                            <!-- Github Chart -->
+                            <canvas id="github-chart" height="250px"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="card visualization-section">
-            <div class="card-header">Stack Overflow Results</div>
-            <div class="card-body">
-                <div id="stack-overflow-result-chart" class="result-chart">
-                    <!-- Stack Overflow Chart -->
-                    <canvas id="stack-overflow-chart" height="250px"></canvas>
+            
+            <div class="col-sm-6">
+                <div class="card visualization-section">
+                    <div class="card-header">Stack Overflow Results</div>
+                    <div class="card-body">
+                        <div id="stack-overflow-result-chart" class="result-chart">
+                            <!-- Stack Overflow Chart -->
+                            <canvas id="stack-overflow-chart" height="250px"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
 
     <!-- Bootstrap Javascript Files -->
     <script
