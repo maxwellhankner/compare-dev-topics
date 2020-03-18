@@ -74,29 +74,35 @@ $(document).on('click', '.topic-element', function(event){
 
 })
 
-// Search button listener
+// -------------------------------------------------- Run Search
 searchButton.click(function(event){
     // Do not refresh
     event.preventDefault();
     // Clear the search form text
     searchField.val('');
     // Show the chart result container
-    chartResultsContainer.attr('style', 'display: grid;');
+    chartResultsContainer.attr('style', 'display: block;');
     // Hide the welcome container
     welcomeContainer.attr('style', 'display: none;');
 
-    // create and polulate both result arrays
-    for (i = 0; i < topicsArray.length; i++) {
-        // call github api function and set response into github array
-        // call stock overflow api function and set response into stack overflow array
-    }
+    // Arrays to store api call response values
+    var githubResultArray = [];
+    var stackOverflowResultsArray = [];
+
+    createResultArrays(topicsArray, githubResultArray, stackOverflowResultsArray);
 
     // Run buildChart functions with the arrays
-    buildGithubChart(['react'], [10000]);
-    buildStackOverflowChart(['react'], [8700]);
-    // buildGithubChart(['react', 'angular'], [9000, 7600]);
-    // buildStackOverflowChart(['react', 'angular'], [12000, 5700]);
+    buildGithubChart(topicsArray, githubResultArray);
+    buildStackOverflowChart(topicsArray, stackOverflowResultsArray);
 })
+
+// Create result arrays
+function createResultArrays(topics, github, stackOverflow) {
+    for (i = 0; i < topics.length; i++) {
+        // call github api function and put response into github array
+        // call stock overflow api function and put response into stack overflow array
+    }
+}
 
 // -------------------------------------------------- Chart Functions
 // Select github canvas
