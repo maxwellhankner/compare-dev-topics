@@ -1,30 +1,29 @@
-"use strict";
+//////////////////////////////////////////////////////////////////////////
+//   Object for interacting with the tag api of stackoverflow
+//      - Accepts an array, single-item array, single sting, or stringfied array.
+//        e.g.
+//          ["reactjs", "vuejs"]
+//          ["reactjs"]
+//          "reactjs"
+//          "reactjs,vuejs,angularjs"
+//
+// - Usage:
 
 var GetStackOverflow = function() {
-  //////////////////////////////////////////////////////////////////////////
-  // remove spaces and replace commas with semi-colons for queryString
-  this.buildStringList = function(array) {
-    return array
-      .toString()
-      .split(" ")
-      .join("")
-      .split(",")
-      .join(";");
-  };
+  "use strict";
 
-  //////////////////////////////////////////////////////////////////////////
-  //set queryURL based on request type.
-  //    - Accepts an array, single-item array, single sting, or stringfied array.
-  //      e.g.
-  //        ["reactjs", "vuejs"]
-  //        ["reactjs"]
-  //        "reactjs"
-  //        "reactjs,vuejs,angularjs"
-  //
   this.buildQueryString = function(tagArray) {
-    // console.log(typeof tagArray);
-    // console.log(tagArray);
+    //////////////////////////////////////////////////////////////////////////
+    //set queryURL based on request type.
+    //    - Accepts an array, single-item array, single sting, or stringfied array.
+    //      e.g.
+    //        ["reactjs", "vuejs"]
+    //        ["reactjs"]
+    //        "reactjs"
+    //        "reactjs,vuejs,angularjs"
+    //
     var queryURL;
+
     // a switch is used here to achieve the effect "if/else && always"
     // switch(true) is used here to allow each case to be processed as well as in this particular order.
     switch (true) {
@@ -62,36 +61,55 @@ var GetStackOverflow = function() {
     return queryURL;
   };
 
+  this.buildStringList = function(array) {
+    //////////////////////////////////////////////////////////////////////////
+    // A beep beep bop utility for this.buildQueryString() that helpfully
+    // removes spaces and replace commas with semi-colons for this.queryURL
+    return array
+      .toString()
+      .split(" ")
+      .join("")
+      .split(",")
+      .join(";");
+  };
+
+  //////////////////////////////////////////////////////////////////////////
+  // a jazzy request utility to get a json response and store it as a
+  // property in this object.
   this.getJSON = async function(queryURL) {
     await $.ajax({
       url: queryURL,
       type: "GET",
+      context: this,
       datatype: "json"
     }).then(function(data) {
-      return data;
+      this.parsedJSON = data;
     });
   };
-
-  this.rawJSON;
-  this.parsedJSON;
-
   
+  this.calcCount = async function() {
+    await this.getJSON(this.queryURL);
+    var count = this.parsedJSON.items.reduce(function(total, element) {
+      return total + element.applied_count;
+    }, 0);
 
-  this.calcCount = function (tags) {
-    console.log("Result set. -- stored in: this.result");
-    this.rawJSON = this.getJSON(this.buildQueryString(tags));
-     
-
-  }
-
-  this.result = {}
+    return count;
+  };
+  
+  //////////////////////////////////////////////////////////////////////////
+  // actually call and build the query string  /////////////////////////////
+  //////////////////////////////////////////////////////////////////////////
+  this.count;
+  this.getCount = async function (tags) {
+    this.queryURL = this.buildQueryString(tags);
+    this.count = await this.calcCount()
+    console.log(this.count);
+    return this.count;
+  };
 };
 
-
-
+var tag = "javascript";
 var stackOverflow = new GetStackOverflow();
-var tag = "javascript ,react; angular ,  view,";
-stackOverflow.calcCount(tag);
-console.log(stackOverflow.rawJSON);
-//stackOverflow.buildQueryString(["javascript", "reactjs"], "questions");
+var countPromise = Promise.resolve(stackOverflow.getCount(tag));
 
+console.log("countPromise - ",countPromise);
