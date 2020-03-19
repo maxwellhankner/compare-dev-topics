@@ -125,7 +125,7 @@ function createGithubResultArrays(topic) {
 }
 
 function createStackOverflowResultArrays(topic) {
-    var topicsQuestionCount = stackOverflow.getCount(topic);
+    var topicsQuestionCount = stackOverflow.getCount(topic, "inname");
     return topicsQuestionCount
 }
 
