@@ -1,7 +1,5 @@
-// START document ready function
 
-    
-// console.log("ln 5 gitHubReposCount: "+ getGitHubReposCount("javascript"))
+//console.log("ln 5 gitHubReposCount: "+ getGitHubReposCount("javascript"))
 
 
 // START searchGitHubRepos function
@@ -10,9 +8,9 @@ async function getGitHubReposCount(searchValue){
     var count = 0;
     
     // create queryString variable for GitHub API call
-    var gitHubQueryString = "https://api.github.com/search/repositories?q=language:"+searchValue+"&sort=stars&order=desc";
+    var gitHubQueryString = "https://api.github.com/search/repositories?q=language:"+searchValue+"+"+searchValue+"&sort=stars&order=desc";
     
-    console.log(gitHubQueryString)
+    //console.log(gitHubQueryString)
 
     // START gitHub API call
     await $.ajax({          
@@ -25,7 +23,7 @@ async function getGitHubReposCount(searchValue){
         dataType: "json"  
     }).then(function(response) {
 
-        console.log("ln 29 response.total_count: " + response.total_count);
+        //console.log("ln 29 response.total_count: " + response.total_count);
         count = response.total_count;
 
     });
@@ -36,4 +34,3 @@ async function getGitHubReposCount(searchValue){
 }
 // END searchGitHubRepos function
 
-// START document ready function
