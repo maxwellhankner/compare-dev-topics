@@ -130,6 +130,8 @@ function createStackOverflowResultArrays(topic) {
 }
 
 // -------------------------------------------------- Chart Functions
+// Bar chart colors
+var colors = ['#1ABC9C', '#F39C12', '#E74C3C', '#A569BD'];
 // Select github canvas
 let githubChart = document.getElementById('github-chart').getContext('2d');
 // Github Chart Function
@@ -140,7 +142,8 @@ function buildGithubChart(topics, githubResults){
     for(i = 0; i < topics.length; i++){
         var topicDataObject = {
             label: topics[i],
-            data: [githubResults[i]]
+            data: [githubResults[i]],
+            backgroundColor: colors[i]
         }
         githubDataSet.push(topicDataObject);
     }
@@ -149,7 +152,7 @@ function buildGithubChart(topics, githubResults){
         type: 'bar',
         data: {
             labels: ['Repositories'],
-            datasets: githubDataSet
+            datasets: githubDataSet,
         },
         options: {
             scales: {
@@ -174,7 +177,8 @@ function buildStackOverflowChart(topics, stackOverflowResults){
     for(i = 0; i < topics.length; i++){
         var topicDataObject = {
             label: topics[i],
-            data: [stackOverflowResults[i]]
+            data: [stackOverflowResults[i]],
+            backgroundColor: colors[i]
         }
         stackOverflowDataSet.push(topicDataObject);
     }
