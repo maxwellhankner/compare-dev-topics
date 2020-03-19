@@ -98,7 +98,7 @@ searchButton.click(async function(event){
     // Arrays to store api call response values
     var githubResultsArray = [];
     var stackOverflowResultsArray = [];
-    console.log(topicsArray);
+
     for(i = 0; i < topicsArray.length; i++){
         // Github
         var currentReposCount = await createGithubResultArrays(topicsArray[i])
@@ -106,13 +106,10 @@ searchButton.click(async function(event){
 
         //Stack Overflow
         var currentQuestionCount = await createStackOverflowResultArrays(topicsArray[i])
-        console.log("current stack squestion count: ", currentQuestionCount);
         stackOverflowResultsArray.push(currentQuestionCount);
 
         // console.log(currentCount);
     }
-    
-    console.log(githubResultsArray)
     
 
     // Run buildChart functions with the arrays
@@ -123,13 +120,11 @@ searchButton.click(async function(event){
 
 // Create result arrays
 function createGithubResultArrays(topic) {
-    console.log("github topic: ", topic);
     var topicsReposCount = getGitHubReposCount(topic);
     return topicsReposCount
 }
 
 function createStackOverflowResultArrays(topic) {
-    console.log("stack topic: ", topic);
     var topicsQuestionCount = stackOverflow.getCount(topic);
     return topicsQuestionCount
 }
@@ -139,7 +134,6 @@ function createStackOverflowResultArrays(topic) {
 let githubChart = document.getElementById('github-chart').getContext('2d');
 // Github Chart Function
 function buildGithubChart(topics, githubResults){
-    console.log('results: ' + githubResults);
     // Create empty array for datasets:
     var githubDataSet = [];
     // Loop the topics and populate dataset array
@@ -154,7 +148,7 @@ function buildGithubChart(topics, githubResults){
     let barChart = new Chart(githubChart, {
         type: 'bar',
         data: {
-            labels: ['Questions'],
+            labels: ['Repositories'],
             datasets: githubDataSet
         },
         options: {
@@ -188,7 +182,7 @@ function buildStackOverflowChart(topics, stackOverflowResults){
     let barChart = new Chart(stackOverflowChart, {
         type: 'bar',
         data: {
-            labels: ['Repositories'],
+            labels: ['Questions'],
             datasets: stackOverflowDataSet
         },
         options: {
