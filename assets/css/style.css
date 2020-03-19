@@ -1,15 +1,17 @@
 #page-title:hover {
     cursor: pointer;
 }
-.card {
-    margin: 10px;
-}
-#chart-results-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+.container {
+    margin-top: 10px;
 }
 #search-input-field {
     margin-left: 8px;
+}
+
+
+.form-inline .form-control { 
+    display: inline-block !important; 
+    width: auto!important
 }
 
 /* Topics */

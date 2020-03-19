@@ -1,21 +1,39 @@
 // START document ready function
 
-    // START Github API function call
+    
+// console.log("ln 5 gitHubReposCount: "+ getGitHubReposCount("javascript"))
 
-        // create queryString variable for GitHub API call
 
-        // START gitHub API call
+// START searchGitHubRepos function
+async function getGitHubReposCount(searchValue){
+    
+    var count = 0;
+    
+    // create queryString variable for GitHub API call
+    var gitHubQueryString = "https://api.github.com/search/repositories?q=language:"+searchValue+"&sort=stars&order=desc";
+    
+    console.log(gitHubQueryString)
 
-            // START anonymous callback function on GET success
+    // START gitHub API call
+    await $.ajax({          
+        
+        // use GET to return api data
+        type: "GET",
+        // queryString url
+        url: gitHubQueryString,
+        // data returned will be in json format
+        dataType: "json"  
+    }).then(function(response) {
 
-                // create data object from response
+        console.log("ln 29 response.total_count: " + response.total_count);
+        count = response.total_count;
 
-                // call renderGitHubDetails function
-            
-            // END anonymous callback function on GET success
+    });
+    // END gitHub API call
 
-        // END gitHub API call
+    return count;
 
-    // END Github API function call
+}
+// END searchGitHubRepos function
 
 // START document ready function

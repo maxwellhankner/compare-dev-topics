@@ -34,10 +34,10 @@ addTopicButton.click(function(event){
     event.preventDefault();
     if (!(searchField.val() === '')){
         topicsArray.push(searchField.val());
-    }
-    buildTopicsDiv()
-    searchField.val('');
-})
+        }
+        buildTopicsDiv()
+        searchField.val('');
+    })
 
 // BuildTopicsDiv function
 function buildTopicsDiv(){
@@ -74,35 +74,59 @@ $(document).on('click', '.topic-element', function(event){
 
 })
 
-// Search button listener
-searchButton.click(function(event){
+// -------------------------------------------------- Run Search
+searchButton.click(async function(event){
     // Do not refresh
     event.preventDefault();
+    // If some text is in the field, add it to the topicsArray and build the topic elements
+    if (!(searchField.val() === '')) {
+        topicsArray.push(searchField.val());
+        buildTopicsDiv()
+    }
+    // If nothing is in the seracg field or the topics awway, dont to anything
+    if (searchField.val() === '' && topicsArray.length === 0 ){
+        console.log('nada');
+        return
+    }
     // Clear the search form text
     searchField.val('');
     // Show the chart result container
-    chartResultsContainer.attr('style', 'display: grid;');
+    chartResultsContainer.attr('style', 'display: block;');
     // Hide the welcome container
     welcomeContainer.attr('style', 'display: none;');
+    
 
-    // create and polulate both result arrays
-    for (i = 0; i < topicsArray.length; i++) {
-        // call github api function and set response into github array
-        // call stock overflow api function and set response into stack overflow array
+    // Arrays to store api call response values
+    var githubResultsArray = [];
+    var stackOverflowResultsArray = [];
+    console.log(topicsArray);
+    for(i = 0; i < topicsArray.length; i++){
+        var currentCount = await createResultArrays(topicsArray)
+        githubResultsArray.push(currentCount);
+        console.log(currentCount);
     }
+    
+    console.log(githubResultsArray)
+    
 
     // Run buildChart functions with the arrays
-    buildGithubChart(['react'], [10000]);
-    buildStackOverflowChart(['react'], [8700]);
-    // buildGithubChart(['react', 'angular'], [9000, 7600]);
-    // buildStackOverflowChart(['react', 'angular'], [12000, 5700]);
+    buildGithubChart(topicsArray, githubResultsArray);
+    buildStackOverflowChart(topicsArray, stackOverflowResultsArray);
+    
 })
+
+// Create result arrays
+function createResultArrays(topics) {
+    var topicsReposCount = getGitHubReposCount(topics[i]);
+    return topicsReposCount
+}
 
 // -------------------------------------------------- Chart Functions
 // Select github canvas
 let githubChart = document.getElementById('github-chart').getContext('2d');
 // Github Chart Function
 function buildGithubChart(topics, githubResults){
+    console.log('results: ' + githubResults);
     // Create empty array for datasets:
     var githubDataSet = [];
     // Loop the topics and populate dataset array
