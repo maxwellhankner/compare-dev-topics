@@ -12,7 +12,7 @@
 var GetStackOverflow = function() {
   "use strict";
 
-  this.buildQueryString = function(tagArray) {
+  this.buildQueryString = function(tagArray, endpoint) {
     //////////////////////////////////////////////////////////////////////////
     //set queryURL based on request type.
     //    - Accepts an array, single-item array, single sting, or stringfied array.
@@ -48,10 +48,17 @@ var GetStackOverflow = function() {
       // or, if it a string that includes a comma or semicolon:
       //   - stringify the input.
       case Array.isArray(tagArray) === true || typeof tagArray === "string":
-        queryURL =
-          "https://api.stackexchange.com/2.2/tags/%7B" +
-          this.buildStringList(tagArray) +
-          "%7D/synonyms?order=desc&sort=creation&site=stackoverflow";
+        if (endpoint === "synonyms") {
+          queryURL =
+            "https://api.stackexchange.com/2.2/tags/%7B" +
+            this.buildStringList(tagArray) +
+            "%7D/synonyms?order=desc&sort=creation&site=stackoverflow";
+        } else if (endpoint === "inname") {
+          queryURL =
+            "https://api.stackexchange.com/2.2/tags?order=desc&sort=popular&inname=" +
+            this.buildStringList(tagArray) +
+            "&site=stackoverflow";
+        }
         break;
       default:
         // if you've gotten here, watch out for dragons
@@ -68,7 +75,7 @@ var GetStackOverflow = function() {
     return array
       .toString()
       .split(" ")
-      .join("")
+      .join("%")
       .split(",")
       .join(";");
   };
@@ -86,53 +93,32 @@ var GetStackOverflow = function() {
       this.parsedJSON = data;
     });
   };
-  
-  this.calcCount = async function() {
+
+  this.calcCount = async function(endpoint) {
     await this.getJSON(this.queryURL);
     var count = this.parsedJSON.items.reduce(function(total, element) {
-      //console.log("calc-Count - ",total + element.applied_count);
-      return total + element.applied_count;
+      switch (true) {
+        case endpoint === "synonyms":
+          return total + element.applied_count;
+        case endpoint === "inname":
+          return total + element.count;
+      }
     }, 0);
 
-    //console.log("calcCount - ", count, typeof count);
     return count;
   };
-  
+
   //////////////////////////////////////////////////////////////////////////
   // actually call and build the query string  /////////////////////////////
   //////////////////////////////////////////////////////////////////////////
   this.count;
-  this.getCount = async function (tags) {
-    this.queryURL = this.buildQueryString(tags);
-    this.count = await this.calcCount()
-
-
-
-    //console.log("getCount - ", this.count, typeof this.count);
+  this.getCount = async function(tags, endpoint) {
+    this.queryURL = this.buildQueryString(tags, endpoint);
+    this.count = await this.calcCount(endpoint);
 
     return this.count;
   };
 };
-
-//main.js
-/////////////////////////////////////////////
-
-
-// async function dummy() {
-//   var tag = "javascript";
-//   var stackOverflow = new GetStackOverflow();
-
-//   // call
-//   var countTotal = await stackOverflow.getCount(tag);
-
-//   //console.log("dummy - ",countTotal);
-
-//   return countTotal;
-// }
-
-// var countTotal2 = dummy();
-
-// console.log("countTotal2 - ", countTotal2);
 
 // Stack Ovverflow setup
 var stackOverflow = new GetStackOverflow();
