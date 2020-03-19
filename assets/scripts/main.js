@@ -94,16 +94,22 @@ searchButton.click(async function(event){
     chartResultsContainer.attr('style', 'display: block;');
     // Hide the welcome container
     welcomeContainer.attr('style', 'display: none;');
-    
 
     // Arrays to store api call response values
     var githubResultsArray = [];
     var stackOverflowResultsArray = [];
     console.log(topicsArray);
     for(i = 0; i < topicsArray.length; i++){
-        var currentCount = await createResultArrays(topicsArray)
-        githubResultsArray.push(currentCount);
-        console.log(currentCount);
+        // Github
+        var currentReposCount = await createGithubResultArrays(topicsArray[i])
+        githubResultsArray.push(currentReposCount);
+
+        //Stack Overflow
+        var currentQuestionCount = await createStackOverflowResultArrays(topicsArray[i])
+        console.log("current stack squestion count: ", currentQuestionCount);
+        stackOverflowResultsArray.push(currentQuestionCount);
+
+        // console.log(currentCount);
     }
     
     console.log(githubResultsArray)
@@ -116,9 +122,16 @@ searchButton.click(async function(event){
 })
 
 // Create result arrays
-function createResultArrays(topics) {
-    var topicsReposCount = getGitHubReposCount(topics[i]);
+function createGithubResultArrays(topic) {
+    console.log("github topic: ", topic);
+    var topicsReposCount = getGitHubReposCount(topic);
     return topicsReposCount
+}
+
+function createStackOverflowResultArrays(topic) {
+    console.log("stack topic: ", topic);
+    var topicsQuestionCount = stackOverflow.getCount(topic);
+    return topicsQuestionCount
 }
 
 // -------------------------------------------------- Chart Functions
