@@ -90,9 +90,11 @@ var GetStackOverflow = function() {
   this.calcCount = async function() {
     await this.getJSON(this.queryURL);
     var count = this.parsedJSON.items.reduce(function(total, element) {
+      //console.log("calc-Count - ",total + element.applied_count);
       return total + element.applied_count;
     }, 0);
 
+    //console.log("calcCount - ", count, typeof count);
     return count;
   };
   
@@ -103,13 +105,31 @@ var GetStackOverflow = function() {
   this.getCount = async function (tags) {
     this.queryURL = this.buildQueryString(tags);
     this.count = await this.calcCount()
-    console.log(this.count);
+
+
+
+    //console.log("getCount - ", this.count, typeof this.count);
+
     return this.count;
   };
 };
 
-var tag = "javascript";
-var stackOverflow = new GetStackOverflow();
-var countPromise = Promise.resolve(stackOverflow.getCount(tag));
+//main.js
+/////////////////////////////////////////////
 
-console.log("countPromise - ",countPromise);
+
+// async function dummy() {
+//   var tag = "javascript";
+//   var stackOverflow = new GetStackOverflow();
+
+//   // call
+//   var countTotal = await stackOverflow.getCount(tag);
+
+//   //console.log("dummy - ",countTotal);
+
+//   return countTotal;
+// }
+
+// var countTotal2 = dummy();
+
+// console.log("countTotal2 - ", countTotal2);
