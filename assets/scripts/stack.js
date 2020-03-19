@@ -133,3 +133,6 @@ var GetStackOverflow = function() {
 // var countTotal2 = dummy();
 
 // console.log("countTotal2 - ", countTotal2);
+
+// Stack Ovverflow setup
+var stackOverflow = new GetStackOverflow();
