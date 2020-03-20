@@ -21,6 +21,14 @@ chartResultsContainer.attr('style', 'display: none;');
 pageTitle.click(function(event){
     // Do not refresh
     event.preventDefault();
+    // Clear topics array
+    topicsArray = []
+    // Build topics array elements
+    buildTopicsDiv();
+    // Clear charts
+    barChartGithub.destroy();
+    barChartStack.destroy();
+
     // Show the chart result container
     chartResultsContainer.attr('style', 'display: none;');
     // Hide the welcome container
@@ -134,6 +142,8 @@ function createStackOverflowResultArrays(topic) {
 var colors = ['#1ABC9C', '#F39C12', '#E74C3C', '#A569BD'];
 // Select github canvas
 let githubChart = document.getElementById('github-chart').getContext('2d');
+// Creat chart
+let barChartGithub;
 // Github Chart Function
 function buildGithubChart(topics, githubResults){
     // Create empty array for datasets:
@@ -148,7 +158,7 @@ function buildGithubChart(topics, githubResults){
         githubDataSet.push(topicDataObject);
     }
     // Build the chart according to githubDataSet
-    let barChart = new Chart(githubChart, {
+    barChartGithub = new Chart(githubChart, {
         type: 'bar',
         data: {
             labels: ['Repositories'],
@@ -169,6 +179,8 @@ function buildGithubChart(topics, githubResults){
 
 // Select stack overflow canvas
 let stackOverflowChart = document.getElementById('stack-overflow-chart').getContext('2d');
+// Create chart variable
+let barChartStack
 // Stack Overflow Chart Function
 function buildStackOverflowChart(topics, stackOverflowResults){
     // Create empty array for datasets:
@@ -183,7 +195,7 @@ function buildStackOverflowChart(topics, stackOverflowResults){
         stackOverflowDataSet.push(topicDataObject);
     }
     // Build the chard according to stackOverflowDataSet
-    let barChart = new Chart(stackOverflowChart, {
+    barChartStack = new Chart(stackOverflowChart, {
         type: 'bar',
         data: {
             labels: ['Questions'],
