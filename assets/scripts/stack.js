@@ -48,16 +48,19 @@ var GetStackOverflow = function() {
       // or, if it a string that includes a comma or semicolon:
       //   - stringify the input.
       case Array.isArray(tagArray) === true || typeof tagArray === "string":
-        if (endpoint === "synonyms") {
-          queryURL =
-            "https://api.stackexchange.com/2.2/tags/%7B" +
-            this.buildStringList(tagArray) +
-            "%7D/synonyms?order=desc&sort=creation&site=stackoverflow";
-        } else if (endpoint === "inname") {
-          queryURL =
-            "https://api.stackexchange.com/2.2/tags?order=desc&sort=popular&inname=" +
-            this.buildStringList(tagArray) +
-            "&site=stackoverflow";
+        switch (true){
+          case endpoint === "synonyms":
+            queryURL =
+              "https://api.stackexchange.com/2.2/tags/%7B" +
+              this.buildStringList(tagArray) +
+              "%7D/synonyms?order=desc&sort=creation&site=stackoverflow";
+              break;
+          case endpoint === "inname":
+              queryURL =
+                "https://api.stackexchange.com/2.2/tags?order=desc&sort=popular&inname=" +
+                this.buildStringList(tagArray) +
+                "&site=stackoverflow";
+              break;
         }
         break;
       default:
@@ -120,5 +123,5 @@ var GetStackOverflow = function() {
   };
 };
 
-// Stack Ovverflow setup
+// Stack Overflow setup
 var stackOverflow = new GetStackOverflow();
