@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////
-//   Object for interacting with the tag api of stackoverflow
+//   A singleton Object for interacting with the tag api of stackoverflow
 //      - Accepts an array, single-item array, single sting, or stringfied array.
 //        e.g.
 //          ["reactjs", "vuejs"]
@@ -8,6 +8,14 @@
 //          "reactjs,vuejs,angularjs"
 //
 // - Usage:
+//    Create the object:
+//        var stackOverflow = new GetStackOverflow();
+//
+//    to get the count of posts applied to all synonyms of a stackoverflow tag:
+//        stackOverflow.getCount("javascript","synonyms");
+//
+//    to get the count of all posts with javascript in the tag name
+//        stackOverflow.getCount("javascript","inname");
 
 var GetStackOverflow = function() {
   "use strict";
