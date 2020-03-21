@@ -105,8 +105,42 @@ var GetStackOverflow = function() {
     });
   };
 
+
+  this.queryTags = [];
+  this.cacheQueryTags = async function (endpoint, fetchNew = false, tags) {
+    // stores stackoverflow tags from a tag-inname request to an array
+    if(fetchNew){
+      if(tags.length > 0){
+        this.queryURL = this.buildQueryString(tags, endpoint);
+        await this.getJSON(this.queryURL);
+      } else {
+        throw "fetchNew set to true, tags param must be specified.";
+      };
+    };
+
+    this.queryTags = this.parsedJSON.items.map(function (element){
+      switch(true){
+        case endpoint === "synonyms":
+          var obj = {
+            parentTag: element.to_tag,
+            synonym: element.from_tag
+          };
+          return obj;
+        case endpoint === "inname":
+          var obj = {
+            tagName: element.name,
+            tagCount: element.count
+          };
+          return obj;
+      }
+    });
+
+    console.log(this.queryTags);
+  }
+
   this.calcCount = async function(endpoint) {
     await this.getJSON(this.queryURL);
+    await this.cacheQueryTags(endpoint);
     var count = this.parsedJSON.items.reduce(function(total, element) {
       switch (true) {
         case endpoint === "synonyms":
@@ -133,3 +167,4 @@ var GetStackOverflow = function() {
 
 // Stack Overflow setup
 var stackOverflow = new GetStackOverflow();
+//stackOverflow.cacheQueryTags("inname",true,"javascript");
