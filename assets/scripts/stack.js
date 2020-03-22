@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////
-//   Object for interacting with the tag api of stackoverflow
+//   A singleton facade Object for interacting with the tag api of stackoverflow
 //      - Accepts an array, single-item array, single sting, or stringfied array.
 //        e.g.
 //          ["reactjs", "vuejs"]
@@ -8,6 +8,17 @@
 //          "reactjs,vuejs,angularjs"
 //
 // - Usage:
+//    Create the object:
+//        var stackOverflow = new GetStackOverflow();
+//
+//    to get the count of all posts with javascript in the tag name
+//        stackOverflow.getCount("javascript","inname");
+//
+//    to get the top 3 questions on a tag using cached tags (max 30).
+//        stackOverflow.getFaqOnTag(tag, 3);
+//
+//
+// TODO: error handling for network requests. (throttle limit specifically)
 
 var GetStackOverflow = function() {
   "use strict";
@@ -48,16 +59,44 @@ var GetStackOverflow = function() {
       // or, if it a string that includes a comma or semicolon:
       //   - stringify the input.
       case Array.isArray(tagArray) === true || typeof tagArray === "string":
-        if (endpoint === "synonyms") {
-          queryURL =
-            "https://api.stackexchange.com/2.2/tags/%7B" +
-            this.buildStringList(tagArray) +
-            "%7D/synonyms?order=desc&sort=creation&site=stackoverflow";
-        } else if (endpoint === "inname") {
-          queryURL =
-            "https://api.stackexchange.com/2.2/tags?order=desc&sort=popular&inname=" +
-            this.buildStringList(tagArray) +
-            "&site=stackoverflow";
+        switch (true){
+          case endpoint === "synonyms":
+            // deprecated - query may find use later.
+            queryURL =
+              "https://api.stackexchange.com/2.2/tags/%7B" +
+              this.buildStringList(tagArray) +
+              "%7D/synonyms?order=desc&sort=creation&site=stackoverflow";
+            break;
+          case endpoint === "inname":
+            // implemented
+            queryURL =
+              "https://api.stackexchange.com/2.2/tags?order=desc&sort=popular&inname=" +
+              this.buildStringList(tagArray) +
+              "&site=stackoverflow";
+            break;
+          case endpoint === "related":
+            queryURL = 
+              "https://api.stackexchange.com/2.2/tags/" +
+              this.buildStringList(tagArray) +
+              "/related?pagesize=100&site=stackoverflow"
+            break;
+          case endpoint === "faq":
+            // implemented
+            queryURL =
+              "https://api.stackexchange.com/2.2/tags/" +
+              this.buildStringList(tagArray) +
+              "/faq?site=stackoverflow";
+            break;
+          case endpoint === "popular_recent":
+            queryURL =
+              "https://api.stackexchange.com/2.2/tags?pagesize=100&fromdate=" +
+              this.setRecentTimeWindow(4) +
+              "&order=desc&sort=popular&site=stackoverflow";
+            break;
+          case endpoint === "popular_alltime":
+            queryURL =
+              "https://api.stackexchange.com/2.2/tags?pagesize=100&order=desc&sort=popular&site=stackoverflow";
+            break;
         }
         break;
       default:
@@ -80,10 +119,21 @@ var GetStackOverflow = function() {
       .join(";");
   };
 
-  //////////////////////////////////////////////////////////////////////////
-  // a jazzy request utility to get a json response and store it as a
-  // property in this object.
+  this.setRecentTimeWindow = function(minusYears) {
+    var currentDate = new Date();
+    var currentTimeEpochSeconds = Math.floor(currentDate.getTime() / 1000);
+
+    // return current time minus x years
+    //    - the number of seconds in a day (86400)
+    //    - the number of days in an average year (365)
+    return currentTimeEpochSeconds - ((86400 * 365) * minusYears);
+  };
+
+  
   this.getJSON = async function(queryURL) {
+    //////////////////////////////////////////////////////////////////////////
+    // a jazzy request utility to get a json response and store it as a
+    // property in this object.
     await $.ajax({
       url: queryURL,
       type: "GET",
@@ -94,25 +144,92 @@ var GetStackOverflow = function() {
     });
   };
 
+
+  this.queryTags = [];
+  this.cacheQueryTags = async function (endpoint, fetchNew = false, tags) {
+    // stores stackoverflow tags from a tag-inname request to an array
+    if(fetchNew){
+      if(tags.length > 0){
+        this.queryURL = this.buildQueryString(tags, endpoint);
+        await this.getJSON(this.queryURL);
+      } else {
+        throw "fetchNew set to true, tags param must be specified.";
+      };
+    };
+
+    this.queryTags = this.parsedJSON.items.map(function (element){
+      switch(true){
+        case endpoint === "synonyms":
+          var obj = {
+            parentTag: element.to_tag,
+            synonym: element.from_tag
+          };
+          return obj;
+        case endpoint === "inname":
+          var obj = {
+            tagName: element.name,
+            tagCount: element.count
+          };
+          return obj;
+      }
+    });
+  };
+
+  this.faqs = {};
+  this.getFaqOnTag = async function (tag, returnCount,fetchNew = false) {
+
+    // update the tag cache
+    if(fetchNew){
+      if(tag.length > 0){
+        await this.cacheQueryTags("inname",true,tag);
+      } else {
+        throw "fetchNew set to true, tag param must be specified.";
+      };
+    };
+
+    // get top entry from tag cache
+    // generate new query string for faqs on top entry from tag cache
+    this.queryURL = await this.buildQueryString(this.queryTags[0].tagName,"faq");
+
+    // place fetch on query 
+    await this.getJSON(this.queryURL);
+    
+    // map query results to object
+    this.faqs = this.parsedJSON.items.map(function (element) {
+      var obj = {
+        title: element.title,
+        link: element.link,
+        views: element.view_count,
+        tags: element.tags
+      }
+      return obj;
+    });
+    
+    // return objects based in desired count
+    return this.faqs.slice(0,returnCount)
+  };
+
+  this.relatedTags = {};
+  this.getRelatedOnTag = async function (tag) {
+    
+  };
+  this.getRelated_OR_onTags = async function (tagArray) {
+
+  };
+
   this.calcCount = async function(endpoint) {
     await this.getJSON(this.queryURL);
+    await this.cacheQueryTags(endpoint);
     var count = this.parsedJSON.items.reduce(function(total, element) {
-      switch (true) {
-        case endpoint === "synonyms":
-          return total + element.applied_count;
-        case endpoint === "inname":
-          return total + element.count;
-      }
+      return total + element.count;
     }, 0);
 
     return count;
   };
 
-  //////////////////////////////////////////////////////////////////////////
-  // actually call and build the query string  /////////////////////////////
-  //////////////////////////////////////////////////////////////////////////
   this.count;
   this.getCount = async function(tags, endpoint) {
+    // actually call and build the query string for counting tagged items
     this.queryURL = this.buildQueryString(tags, endpoint);
     this.count = await this.calcCount(endpoint);
 
@@ -120,5 +237,16 @@ var GetStackOverflow = function() {
   };
 };
 
-// Stack Ovverflow setup
+// Stack Overflow setup
 var stackOverflow = new GetStackOverflow();
+
+
+///////////// Useful function test calls
+//var tag = "javascript";
+//console.log(stackOverflow.buildQueryString(tag,"popular_recent"));
+//stackOverflow.getCount(tag,"inname"); //add console.log(this.count) to line before return.
+//stackOverflow.getFaqOnTag(tag, 3, true);
+//console.log(stackOverflow.buildQueryString(tag,"faq"));
+//stackOverflow.cacheQueryTags("inname",true,tag);
+//stackOverflow.getFaqOnTag(tag,3);
+//console.log(stackOverflow.setRecentTimeWindow(4));
