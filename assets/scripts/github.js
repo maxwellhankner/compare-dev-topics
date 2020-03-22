@@ -1,7 +1,4 @@
 
-//console.log("ln 5 gitHubReposCount: "+ getGitHubReposCount("javascript"))
-
-
 // START searchGitHubRepos function
 async function getGitHubReposCount(searchValue){
     
@@ -9,12 +6,9 @@ async function getGitHubReposCount(searchValue){
     
     // create queryString variable for GitHub API call
     var gitHubQueryString = "https://api.github.com/search/repositories?q=language:"+searchValue+"+"+searchValue+"&sort=stars&order=desc";
-    
-    //console.log(gitHubQueryString)
 
     // START gitHub API call
-    await $.ajax({          
-        
+    await $.ajax({
         // use GET to return api data
         type: "GET",
         // queryString url
@@ -23,7 +17,6 @@ async function getGitHubReposCount(searchValue){
         dataType: "json"  
     }).then(function(response) {
 
-        //console.log("ln 29 response.total_count: " + response.total_count);
         count = response.total_count;
 
     });
@@ -34,3 +27,43 @@ async function getGitHubReposCount(searchValue){
 }
 // END searchGitHubRepos function
 
+getTopGitHubRepos("Javascript");
+// START getTopGithubRepos
+    async function getTopGitHubRepos(searchValue){
+        
+        // create blank array of objects
+        var arrGitHubObjects = [{}];
+        
+        // create queryString URL
+        var gitHubQueryString = "https://api.github.com/search/repositories?q=language:"+searchValue+"+"+searchValue+"&sort=stars&order=desc";
+       
+        // START gitHub API call
+        await $.ajax({
+            // use GET to return api data
+            type: "GET",
+            // queryString url
+            url: gitHubQueryString,
+            // data returned will be in json format
+            dataType: "json"  
+            // then promise
+        }).then(function(response) {
+                
+            // START iterate through top five objects in response 
+            for (var i = 0; i < 5; i++){
+
+                // create var for current repo object
+                var repo = response.items[0];
+                
+                // assign repo title and link to object at current index
+                arrGitHubObjects.push({name: repo.name, url: repo.url, description: repo.description}); 
+
+            }
+            // END iterate through top five objects in response
+
+        });
+        // END gitHub API call
+
+        return arrGitHubObjects;
+
+    }
+// END getTopGitHubRepos
