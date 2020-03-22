@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////
-//   A singleton Object for interacting with the tag api of stackoverflow
+//   A singleton facade Object for interacting with the tag api of stackoverflow
 //      - Accepts an array, single-item array, single sting, or stringfied array.
 //        e.g.
 //          ["reactjs", "vuejs"]
@@ -11,11 +11,13 @@
 //    Create the object:
 //        var stackOverflow = new GetStackOverflow();
 //
-//    to get the count of posts applied to all synonyms of a stackoverflow tag:
-//        stackOverflow.getCount("javascript","synonyms");
-//
 //    to get the count of all posts with javascript in the tag name
 //        stackOverflow.getCount("javascript","inname");
+//
+//    to get the top 3 questions on a tag using cached tags (max 30).
+//        stackOverflow.getFaqOnTag(tag, 3);
+//
+//
 
 var GetStackOverflow = function() {
   "use strict";
@@ -62,13 +64,35 @@ var GetStackOverflow = function() {
               "https://api.stackexchange.com/2.2/tags/%7B" +
               this.buildStringList(tagArray) +
               "%7D/synonyms?order=desc&sort=creation&site=stackoverflow";
-              break;
+            break;
           case endpoint === "inname":
-              queryURL =
-                "https://api.stackexchange.com/2.2/tags?order=desc&sort=popular&inname=" +
-                this.buildStringList(tagArray) +
-                "&site=stackoverflow";
-              break;
+            queryURL =
+              "https://api.stackexchange.com/2.2/tags?order=desc&sort=popular&inname=" +
+              this.buildStringList(tagArray) +
+              "&site=stackoverflow";
+            break;
+          case endpoint === "related":
+            queryURL = 
+              "https://api.stackexchange.com/2.2/tags/" +
+              this.buildStringList(tagArray) +
+              "/related?pagesize=100&site=stackoverflow"
+            break;
+          case endpoint === "faq":
+            queryURL =
+              "https://api.stackexchange.com/2.2/tags/" +
+              this.buildStringList(tagArray) +
+              "/faq?site=stackoverflow";
+            break;
+          case endpoint === "popular_recent":
+            queryURL =
+              "https://api.stackexchange.com/2.2/tags?pagesize=100&fromdate=" +
+              this.setRecentTimeWindow(4) +
+              "&order=desc&sort=popular&site=stackoverflow";
+            break;
+          case endpoint === "popular_alltime":
+            queryURL =
+              "https://api.stackexchange.com/2.2/tags?pagesize=100&order=desc&sort=popular&site=stackoverflow";
+            break;
         }
         break;
       default:
@@ -91,10 +115,21 @@ var GetStackOverflow = function() {
       .join(";");
   };
 
-  //////////////////////////////////////////////////////////////////////////
-  // a jazzy request utility to get a json response and store it as a
-  // property in this object.
+  this.setRecentTimeWindow = function(minusYears) {
+    var currentDate = new Date();
+    var currentTimeEpochSeconds = Math.floor(currentDate.getTime() / 1000);
+
+    // return current time minus x years
+    //    - the number of seconds in a day (86400)
+    //    - the number of days in an average year (365)
+    return currentTimeEpochSeconds - ((86400 * 365) * minusYears);
+  };
+
+  
   this.getJSON = async function(queryURL) {
+    //////////////////////////////////////////////////////////////////////////
+    // a jazzy request utility to get a json response and store it as a
+    // property in this object.
     await $.ajax({
       url: queryURL,
       type: "GET",
@@ -134,30 +169,55 @@ var GetStackOverflow = function() {
           return obj;
       }
     });
+  };
 
-    console.log(this.queryTags);
-  }
+  this.faqs = {};
+  this.getFaqOnTag = async function (tag, returnCount,fetchNew = false) {
+
+    // update the tag cache
+    if(fetchNew){
+      if(tag.length > 0){
+        await this.cacheQueryTags("inname",true,tag);
+      } else {
+        throw "fetchNew set to true, tag param must be specified.";
+      };
+    };
+
+    // get top entry from tag cache
+    // generate new query string for faqs on top entry from tag cache
+    this.queryURL = await this.buildQueryString(this.queryTags[0].tagName,"faq");
+
+    // place fetch on query 
+    await this.getJSON(this.queryURL);
+    
+    // map query results to object
+    this.faqs = this.parsedJSON.items.map(function (element) {
+      var obj = {
+        title: element.title,
+        link: element.link,
+        views: element.view_count,
+        tags: element.tags
+      }
+      return obj;
+    });
+    
+    // return objects based in desired count
+    return this.faqs.slice(0,returnCount)
+  };
 
   this.calcCount = async function(endpoint) {
     await this.getJSON(this.queryURL);
     await this.cacheQueryTags(endpoint);
     var count = this.parsedJSON.items.reduce(function(total, element) {
-      switch (true) {
-        case endpoint === "synonyms":
-          return total + element.applied_count;
-        case endpoint === "inname":
-          return total + element.count;
-      }
+      return total + element.count;
     }, 0);
 
     return count;
   };
 
-  //////////////////////////////////////////////////////////////////////////
-  // actually call and build the query string  /////////////////////////////
-  //////////////////////////////////////////////////////////////////////////
   this.count;
   this.getCount = async function(tags, endpoint) {
+    // actually call and build the query string for counting tagged items
     this.queryURL = this.buildQueryString(tags, endpoint);
     this.count = await this.calcCount(endpoint);
 
@@ -167,4 +227,14 @@ var GetStackOverflow = function() {
 
 // Stack Overflow setup
 var stackOverflow = new GetStackOverflow();
-//stackOverflow.cacheQueryTags("inname",true,"javascript");
+
+
+///////////// Useful function test calls
+//var tag = "javascript";
+//console.log(stackOverflow.buildQueryString(tag,"popular_recent"));
+//stackOverflow.getCount(tag,"inname"); //add console.log(this.count) to line before return.
+//stackOverflow.getFaqOnTag(tag, 3, true);
+//console.log(stackOverflow.buildQueryString(tag,"faq"));
+//stackOverflow.cacheQueryTags("inname",true,tag);
+//stackOverflow.getFaqOnTag(tag,3);
+//console.log(stackOverflow.setRecentTimeWindow(4));
