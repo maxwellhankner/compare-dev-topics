@@ -18,6 +18,7 @@
 //        stackOverflow.getFaqOnTag(tag, 3);
 //
 //
+// TODO: error handling for network requests. (throttle limit specifically)
 
 var GetStackOverflow = function() {
   "use strict";
@@ -60,12 +61,14 @@ var GetStackOverflow = function() {
       case Array.isArray(tagArray) === true || typeof tagArray === "string":
         switch (true){
           case endpoint === "synonyms":
+            // deprecated - query may find use later.
             queryURL =
               "https://api.stackexchange.com/2.2/tags/%7B" +
               this.buildStringList(tagArray) +
               "%7D/synonyms?order=desc&sort=creation&site=stackoverflow";
             break;
           case endpoint === "inname":
+            // implemented
             queryURL =
               "https://api.stackexchange.com/2.2/tags?order=desc&sort=popular&inname=" +
               this.buildStringList(tagArray) +
@@ -78,6 +81,7 @@ var GetStackOverflow = function() {
               "/related?pagesize=100&site=stackoverflow"
             break;
           case endpoint === "faq":
+            // implemented
             queryURL =
               "https://api.stackexchange.com/2.2/tags/" +
               this.buildStringList(tagArray) +
@@ -203,6 +207,14 @@ var GetStackOverflow = function() {
     
     // return objects based in desired count
     return this.faqs.slice(0,returnCount)
+  };
+
+  this.relatedTags = {};
+  this.getRelatedOnTag = async function (tag) {
+    
+  };
+  this.getRelated_OR_onTags = async function (tagArray) {
+
   };
 
   this.calcCount = async function(endpoint) {
