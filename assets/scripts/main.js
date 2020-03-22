@@ -132,7 +132,8 @@ searchButton.click(async function(event){
 
         // Stack Overflow top questions array ---------------------------------------------- TODO
         // var currentQuestionObject = await createStackOverflowResultArrays(topicsArray[i])
-        var currentQuestionArray = [{title: 'title', link: 'link'}]
+        var currentQuestionArray = await stackOverflow.getFaqOnTag(topicsArray[i], 3);
+        console.log(currentQuestionArray);
         stackOverflowTopQuestionsArrays.push(currentQuestionArray);
     }
 
@@ -142,7 +143,7 @@ searchButton.click(async function(event){
 
     // Run buildTopResponse functions with the arrays
     buildGithubResponseElement(topicsArray, githubTopReposArrays);
-
+    buildStackOverflowResponseElement(topicsArray, stackOverflowTopQuestionsArrays);
     // console.log(topicsArray)
     // console.log(githubTopReposArray);
     
@@ -283,3 +284,42 @@ function buildGithubResponseElement(topics, reposArrays){
 // function buildStackOverflowResponseElement(topics, stackOverflowTopQuestionsArray){
 //     console.log(topics + " " + stackOverflowTopQuestionsArray[0]);
 // }
+// Build top result element arrays
+function buildStackOverflowResponseElement(topics, questionArrays){
+    // select github card
+    var stackOverflowQuestionsCard = $('#stack-overflow-questions-card')
+    stackOverflowQuestionsCard.empty();
+    // empty everything in github card-body
+    for (i = 0; i < topics.length; i++){
+
+        // create div.card
+        var topicCard = $('<div>');
+        topicCard.addClass('card');
+        // create div.card-header
+        var topicHeader = $('<div>');
+        topicHeader.addClass('card-header');
+        topicHeader.text(topics[i]);
+        topicCard.append(topicHeader);
+        var topicBody = $('<div>');
+        topicBody.addClass('card-body');
+        topicCard.append(topicBody);
+
+        for (x = 0; x < questionArrays[i].length; x++) {
+            // create div.card-body
+            var questionResult = $('<div>');
+            questionResult.addClass('card');
+            var questionHeader = $('<div>');
+            questionHeader.addClass('card-header')
+            questionHeader.text(questionArrays[i][x].title);
+            questionResult.append(questionHeader);
+            var questionBody = $('<div>');
+            questionBody.addClass('card-body');
+            questionBody.text(questionArrays[i][x].link);
+            questionResult.append(questionBody)
+            // append to parent card
+            topicBody.append(questionResult);
+        }
+        // append topic card to github card-body
+        stackOverflowQuestionsCard.append(topicCard);
+    }
+}
