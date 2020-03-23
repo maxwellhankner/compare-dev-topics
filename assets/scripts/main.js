@@ -2,6 +2,7 @@
 // Containers
 var welcomeContainer = $('#welcome-container');
 var chartResultsContainer = $('#chart-results-container');
+var topResultsContatiner = $('#top-results-container');
 // Buttons
 var searchButton = $('#search-submit-button');
 var addTopicButton = $('#add-topic-button');
@@ -16,23 +17,35 @@ var topicContainer = $('#topic-container');
 // -------------------------------------------------- Navigation and View Management
 // Hidden on page launch
 chartResultsContainer.attr('style', 'display: none;');
+topResultsContatiner.attr('style', 'display: none;');
 
 // Title listener
 pageTitle.click(function(event){
     // Do not refresh
     event.preventDefault();
-    // Clear topics array
-    topicsArray = []
+    // Clear arrays
+    topicsArray = [];
+    githubResultsArray = [];
+    stackOverflowResultsArray = [];
+    githubTopReposArray = [];
+    stackOverflowTopQuestionsArray = [];
+    // Clear top results
+    $('#github-repos-card').empty();
+    $('#stack-overflow-questions-card').empty();
     // Build topics array elements
     buildTopicsDiv();
     // Clear charts
     barChartGithub.destroy();
     barChartStack.destroy();
 
+    // ------------------------- TODO Empty the top result containers and hide them ------
+
     // Show the chart result container
     chartResultsContainer.attr('style', 'display: none;');
     // Hide the welcome container
     welcomeContainer.attr('style', 'display: block;');
+    // Hide top results
+    topResultsContatiner.attr('style', 'display: none;');
 })
 
 // -------------------------------------------------- Multisearch
@@ -58,7 +71,7 @@ function buildTopicsDiv(){
 // createTopicElement function
 function createTopicElement(userTopic, index) {
     var newTopicElement = $($.parseHTML('<div class="topic-element"><form class="form-inline"><input id="search-input-field" class="form-control mr-sm-2" aria-label="Search" value="' + userTopic + '" readonly /><button id="' + index + '" class="btn btn-outline-dark my-2 my-sm-0 delete-topic-buttons" type="submit"><i class="material-icons">close</i></button></form></div>'));
-    topicContainer.prepend(newTopicElement);
+    topicContainer.append(newTopicElement);
 }
 
 // Delete topic buttons listener
@@ -102,29 +115,49 @@ searchButton.click(async function(event){
     chartResultsContainer.attr('style', 'display: block;');
     // Hide the welcome container
     welcomeContainer.attr('style', 'display: none;');
+    // Show top results container
+    topResultsContatiner.attr('style', 'display: block;');
 
-    // Arrays to store api call response values
+    // Arrays to store api call count values
     var githubResultsArray = [];
     var stackOverflowResultsArray = [];
+    // Arrays to store api call top resonse values
+    var githubTopReposArrays = [];
+    var stackOverflowTopQuestionsArrays = [];
 
     for(i = 0; i < topicsArray.length; i++){
-        // Github
+        // Github counts array
         var currentReposCount = await createGithubResultArrays(topicsArray[i])
         githubResultsArray.push(currentReposCount);
 
-        //Stack Overflow
+        // Github top repos array ---------------------------------------------- TODO
+        // var currentRepoObject = await createGithubResultArrays(topicsArray[i])
+        var currentRepoArray = await getTopGitHubRepos(topicsArray[i], 3);
+        console.log(currentRepoArray);
+        githubTopReposArrays.push(currentRepoArray);
+
+        //Stack Overflow counts array
         var currentQuestionCount = await createStackOverflowResultArrays(topicsArray[i])
         stackOverflowResultsArray.push(currentQuestionCount);
 
-        // console.log(currentCount);
+        // Stack Overflow top questions array ---------------------------------------------- TODO
+        // var currentQuestionObject = await createStackOverflowResultArrays(topicsArray[i])
+        var currentQuestionArray = await stackOverflow.getFaqOnTag(topicsArray[i], 3);
+        stackOverflowTopQuestionsArrays.push(currentQuestionArray);
     }
-    
 
     // Run buildChart functions with the arrays
     buildGithubChart(topicsArray, githubResultsArray);
     buildStackOverflowChart(topicsArray, stackOverflowResultsArray);
+
+    // Run buildTopResponse functions with the arrays
+    buildGithubResponseElement(topicsArray, githubTopReposArrays);
+    buildStackOverflowResponseElement(topicsArray, stackOverflowTopQuestionsArrays);
+    // console.log(topicsArray)
+    // console.log(githubTopReposArray);
     
 })
+
 
 // Create result arrays
 function createGithubResultArrays(topic) {
@@ -171,7 +204,8 @@ function buildGithubChart(topics, githubResults){
                         beginAtZero: true
                     }
                 }]
-            }
+            },
+            events: []
         }
     });
     
@@ -208,8 +242,111 @@ function buildStackOverflowChart(topics, stackOverflowResults){
                         beginAtZero: true
                     }
                 }]
-            }
+            },
+            events: []
         }
     });
     
+}
+
+// Build top result element arrays
+function buildGithubResponseElement(topics, reposArrays){
+    // select github card
+    var githubReposCard = $('#github-repos-card');
+    githubReposCard.empty();
+    // empty everything in github card-body
+    for (i = 0; i < topics.length; i++){
+        // console.log(topics[i] + " " + reposArrays[i][0].title + " " + reposArrays[i][0].link);
+
+        // create div.card
+        var topicCard = $('<div>');
+        topicCard.addClass('card');
+        // create div.card-header
+        var topicHeader = $('<div>');
+        topicHeader.addClass('card-header');
+        topicHeader.attr('style', 'background-color: ' + colors[i]);
+        topicHeader.text(topics[i]);
+        topicCard.append(topicHeader);
+        var topicBody = $('<div>');
+        topicBody.addClass('card-body');
+        topicCard.append(topicBody);
+
+        for (x = 0; x < reposArrays[i].length; x++) {
+            // create div.card-body
+            var repoResult = $('<div>');
+            repoResult.addClass('card-body');
+            var repoLink = $('<a>');
+            // add href
+            // add target
+            repoLink.attr('href', reposArrays[i][x].url);
+            repoLink.attr('target', '_blank')
+
+            var repoButton = $('<button>');
+            repoButton.attr('type', 'button');
+            repoButton.addClass('btn btn-outline-dark btn-block');
+            repoButton.text(reposArrays[i][x].name)
+
+            repoLink.append(repoButton);
+
+            repoResult.append(repoLink)
+
+
+            // append to parent card
+            topicBody.append(repoResult);
+        }
+        // append topic card to github card-body
+        githubReposCard.append(topicCard);
+    }
+}
+
+// function buildStackOverflowResponseElement(topics, stackOverflowTopQuestionsArray){
+//     console.log(topics + " " + stackOverflowTopQuestionsArray[0]);
+// }
+// Build top result element arrays
+function buildStackOverflowResponseElement(topics, questionArrays){
+    // select github card
+    var stackOverflowQuestionsCard = $('#stack-overflow-questions-card')
+    stackOverflowQuestionsCard.empty();
+    // empty everything in github card-body
+    for (i = 0; i < topics.length; i++){
+
+        // create div.card
+        var topicCard = $('<div>');
+        topicCard.addClass('card');
+        // create div.card-header
+        var topicHeader = $('<div>');
+        topicHeader.attr('style', 'background-color: ' + colors[i]);
+        topicHeader.addClass('card-header');
+        topicHeader.text(topics[i]);
+        topicCard.append(topicHeader);
+        var topicBody = $('<div>');
+        topicBody.addClass('card-body');
+        topicCard.append(topicBody);
+
+        for (x = 0; x < questionArrays[i].length; x++) {
+            // create div.card-body
+            var questionResult = $('<div>');
+            questionResult.addClass('card-body');
+            var questionLink = $('<a>');
+            // add href
+            // add target
+            questionLink.attr('href', questionArrays[i][x].link);
+            questionLink.attr('target', '_blank')
+
+            var questionButton = $('<button>');
+            questionButton.attr('type', 'button');
+            questionButton.addClass('btn btn-outline-dark btn-block');
+            questionButton.text(questionArrays[i][x].title)
+
+            questionLink.append(questionButton);
+
+            questionResult.append(questionLink)
+
+
+            // append to parent card
+            topicBody.append(questionResult);
+        }
+        // append topic card to github card-body
+        stackOverflowQuestionsCard.append(topicCard);
+    }
 }
