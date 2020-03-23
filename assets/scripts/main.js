@@ -299,9 +299,6 @@ function buildGithubResponseElement(topics, reposArrays){
     }
 }
 
-// function buildStackOverflowResponseElement(topics, stackOverflowTopQuestionsArray){
-//     console.log(topics + " " + stackOverflowTopQuestionsArray[0]);
-// }
 // Build top result element arrays
 function buildStackOverflowResponseElement(topics, questionArrays){
     // select github card
