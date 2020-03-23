@@ -42,3 +42,7 @@
 .top-response-button{
     display: block;
 }
+
+.steps {
+    list-style-type: none;
+}
