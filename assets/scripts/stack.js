@@ -175,6 +175,57 @@ var GetStackOverflow = function() {
     });
   };
 
+  this.decodeCharEntities = function (strWithEntity) {
+    // given the string "setState doesn&#39;t update the state immediately"
+    //
+    // we need to convert the character entity &#39; into an apostrophe (')
+    // without manually creating an entry in an enumeration for every character entity
+    // that may be encountered.
+
+    // javascript doesn't parse HTML character entities by default,
+    // in order to clean up the entities that are returned in question
+    // titles returned by StackExchange, we have to tell JS to treat
+    // each returned title as HTML.  To do that we:
+
+    // spin up the the DOM parser engine
+    var parser = new DOMParser()
+
+    // Again, given that strWithEntity = "setState doesn&#39;t update the state immediately"
+    // we convert each title (strWithEntity) to a new documentFragment.
+    var documentFragment = parser.parseFromString(strWithEntity, "text/html")
+    // Now strWithEntity no longer a typeof string, but instead a complete and 
+    // independent html document with child nodes (var doc). 
+    // var doc's now DOM is:
+    // <html>
+    //    <head></head>
+    //    <body>
+    //      setState doesn't update the state immediately
+    //    </body>
+    // </html>
+    //
+    // this implicitly decodes the character entity for an apostrophe (&#39;) or
+    // any other character entity for that matter, because it's html and no longer a simple a JS string.
+
+    // the only thing that's left is to extract the text content from the body of our
+    // temporary html document fragment.
+    return documentFragment.body.textContent;
+
+    // though not encountered yet, the only forseeable problem with this
+    // solution is a case where quotes (single or double) might be decoded
+    //  and returned into a json-like object.
+    //  
+    //  i.e. 
+    //    " " " or ' ' '  
+    // 
+    //    though...
+    //   " ' " and ' " '
+    //    will not pose an issue.
+    //
+    // if these cases arise, the Javascript engine itself will certainly choke on the malformed string.
+  };
+
+  
+
   this.faqs = {};
   this.getFaqOnTag = async function (tag, returnCount,fetchNew = false) {
 
@@ -193,28 +244,32 @@ var GetStackOverflow = function() {
 
     // place fetch on query 
     await this.getJSON(this.queryURL);
-    
+    var that = this;
     // map query results to object
     this.faqs = this.parsedJSON.items.map(function (element) {
       var obj = {
-        title: element.title,
+        title: this.decodeCharEntities(element.title),
         link: element.link,
         views: element.view_count,
         tags: element.tags
       }
       return obj;
-    });
-    
+    }, this);
+
     // return objects based in desired count
     return this.faqs.slice(0,returnCount)
   };
 
   this.relatedTags = {};
   this.getRelatedOnTag = async function (tag) {
-    
+    console.log("getRelatedOnTag is not yet implemented");
   };
   this.getRelated_OR_onTags = async function (tagArray) {
-
+    // The stack exchange API does accept multiple tags, but ANDs them implicitly.
+    // in order to provide an ORDERED single data set of related tags for any compared topics
+    // the related tags API must be hit for each search term, the results for each term must be
+    // concatenated into a single array, and then sorted by times a given tag has been applied.
+    console.log("getRelated_OR_onTags is not yet implemented");
   };
 
   this.calcCount = async function(endpoint) {
@@ -242,10 +297,10 @@ var stackOverflow = new GetStackOverflow();
 
 
 ///////////// Useful function test calls
-//var tag = "javascript";
+//var tag = "react";
 //console.log(stackOverflow.buildQueryString(tag,"popular_recent"));
 //stackOverflow.getCount(tag,"inname"); //add console.log(this.count) to line before return.
-//stackOverflow.getFaqOnTag(tag, 3, true);
+//stackOverflow.getFaqOnTag(tag, 3, true); //add console.log(this.faqs.slice(0,returnCount)); to line before return
 //console.log(stackOverflow.buildQueryString(tag,"faq"));
 //stackOverflow.cacheQueryTags("inname",true,tag);
 //stackOverflow.getFaqOnTag(tag,3);
