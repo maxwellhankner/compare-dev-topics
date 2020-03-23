@@ -132,7 +132,8 @@ searchButton.click(async function(event){
 
         // Github top repos array ---------------------------------------------- TODO
         // var currentRepoObject = await createGithubResultArrays(topicsArray[i])
-        var currentRepoArray = [{title: 'title1', link: 'link1'}, {title: 'title2', link: 'link2'}]
+        var currentRepoArray = await getTopGitHubRepos(topicsArray[i], 3);
+        console.log(currentRepoArray);
         githubTopReposArrays.push(currentRepoArray);
 
         //Stack Overflow counts array
@@ -277,13 +278,13 @@ function buildGithubResponseElement(topics, reposArrays){
             var repoLink = $('<a>');
             // add href
             // add target
-            repoLink.attr('href', reposArrays[i][x].link);
+            repoLink.attr('href', reposArrays[i][x].url);
             repoLink.attr('target', '_blank')
 
             var repoButton = $('<button>');
             repoButton.attr('type', 'button');
             repoButton.addClass('btn btn-outline-dark btn-block');
-            repoButton.text(reposArrays[i][x].title)
+            repoButton.text(reposArrays[i][x].name)
 
             repoLink.append(repoButton);
 
